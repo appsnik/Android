@@ -7,27 +7,41 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.WebView;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Observable;
+import java.util.Observer;
 
-public class MainActivity extends AppCompatActivity {
-    public static final String TAG = "Chuck";
+public class MainActivity extends AppCompatActivity implements Observer {
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+    }
+
+    private MyBroadcastReceiver receiver = new MyBroadcastReceiver();
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, receiver.intentfilter);
+        ConnectivityChangeObservable.instance().addObserver(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ConnectivityChangeObservable.instance().deleteObserver(this);
+        unregisterReceiver(receiver);
     }
 
     @Override
@@ -52,11 +66,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void getChuckFact(View view) {
-        getRamdomJoke();
+    @Override // Observer interface
+    public void update(Observable observable, Object data) {
+        findViewById(R.id.get_chuck).setEnabled((Boolean) data);
     }
 
-    public void getRamdomJoke() {
+    public void getChuckFact(View view) {
+        getRandomJoke();
+    }
+
+    public void getRandomJoke() {
         new DownloadTask() {
             @Override
             protected void onPostExecute(String result) {
@@ -67,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
                         if (json.getString("type").equals("success")) {
                             JSONObject jsonValue = json.getJSONObject("value");
                             String joke = jsonValue.getString("joke");
-                            TextView textbox = (TextView) findViewById(R.id.joke_text_box);
+                            TextView textbox = (TextView)findViewById(R.id.joke_text_box);
                             textbox.setText(joke);
                         }
                     } catch (JSONException e) {
@@ -122,9 +141,9 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG, null != result ? result : "(null)");
         }
 
-    private String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        private String convertStreamToString(java.io.InputStream is) {
+            java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";
+        }
     }
-}
 }
