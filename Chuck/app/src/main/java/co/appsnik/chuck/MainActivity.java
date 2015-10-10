@@ -1,12 +1,15 @@
 package co.appsnik.chuck;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -21,11 +24,26 @@ import java.util.Observer;
 
 public class MainActivity extends AppCompatActivity implements Observer {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String KEY_JOKE = "joke";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        refreshJokeText(null);
+
+        WebView webview = (WebView)findViewById(R.id.attibutions);
+        webview.loadData(getString(R.string.icon_attirbution), "text/html", null);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private MyBroadcastReceiver receiver = new MyBroadcastReceiver();
@@ -71,6 +89,17 @@ public class MainActivity extends AppCompatActivity implements Observer {
         findViewById(R.id.get_chuck).setEnabled((Boolean) data);
     }
 
+    public void refreshJokeText(String joke) {
+        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        if (joke != null) {
+            prefs.edit().putString(KEY_JOKE, joke).commit();
+        } else {
+            joke = prefs.getString(KEY_JOKE, "");
+        }
+        TextView textbox = (TextView)findViewById(R.id.joke_text_box);
+        textbox.setText(Html.fromHtml(joke));
+    }
+
     public void getChuckFact(View view) {
         getRandomJoke();
     }
@@ -86,8 +115,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                         if (json.getString("type").equals("success")) {
                             JSONObject jsonValue = json.getJSONObject("value");
                             String joke = jsonValue.getString("joke");
-                            TextView textbox = (TextView)findViewById(R.id.joke_text_box);
-                            textbox.setText(joke);
+                            refreshJokeText(joke);
                         }
                     } catch (JSONException e) {
                         Log.i(TAG, "Failed to parse json object.");
@@ -95,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
                     }
                 }
             }
-        }.execute("http://api.icndb.com/jokes/random/");
+        }.execute("http://api.icndb.com/jokes/random?exclude=[explicit]");
     }
 /*
     public void getJokeCount() {
