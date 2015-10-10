@@ -13,7 +13,7 @@
         android:text="@string/button_get_chuck_fact"
         android:onClick="getChuckFact"
         android:textSize="30dp"
-        android:layout_weight="0.20" />
+        android:layout_weight="0.2" />
     <TextView
         android:id="@+id/joke_text_box"
         android:layout_width="match_parent"
@@ -23,5 +23,12 @@
         android:paddingBottom="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_vertical_margin"
         android:textSize="24dp"
-        android:layout_weight="0.33" />
+        android:layout_weight=".7" />
+
+    <WebView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/attibutions"
+        android:layout_weight="0.1" />
+
 </LinearLayout>
