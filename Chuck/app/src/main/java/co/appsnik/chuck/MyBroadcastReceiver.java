@@ -23,7 +23,7 @@ class MyBroadcastReceiver extends BroadcastReceiver {
             ConnectivityChangeObservable.instance().notify(connected);
             Log.i(TAG, "isNetworkConnected=" + connected);
         } else {
-            Log.d(TAG, "Unrecognized intent - " + intent.getAction());
+            Log.i(TAG, "Unrecognized intent - " + intent.getAction());
         }
     }
 

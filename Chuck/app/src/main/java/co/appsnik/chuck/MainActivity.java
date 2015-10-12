@@ -25,6 +25,7 @@ import java.util.Observer;
 public class MainActivity extends AppCompatActivity implements Observer {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String KEY_JOKE = "joke";
+    private final MyBroadcastReceiver receiver = new MyBroadcastReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +46,6 @@ public class MainActivity extends AppCompatActivity implements Observer {
     protected void onDestroy() {
         super.onDestroy();
     }
-
-    private MyBroadcastReceiver receiver = new MyBroadcastReceiver();
 
     @Override
     protected void onResume() {
@@ -118,18 +117,14 @@ public class MainActivity extends AppCompatActivity implements Observer {
                             refreshJokeText(joke);
                         }
                     } catch (JSONException e) {
-                        Log.i(TAG, "Failed to parse json object.");
+                        Log.e(TAG, "Failed to parse json object.");
                         e.printStackTrace();
                     }
                 }
             }
         }.execute("http://api.icndb.com/jokes/random?exclude=[explicit]");
     }
-/*
-    public void getJokeCount() {
-        new DownloadTask().execute("http://api.icndb.com/categories");
-    }
-*/
+
     private class DownloadTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
@@ -146,19 +141,19 @@ public class MainActivity extends AppCompatActivity implements Observer {
                 stream = conn.getInputStream();
                 return convertStreamToString(stream);
             } catch (IOException e) {
-                Log.i(TAG, "Failed to download url: " + urls[0]);
+                Log.e(TAG, "Failed to download url: " + urls[0]);
                 e.printStackTrace();
                 return null;
             } finally {
                 if (stream != null) {
                     try {
-                        Log.i(TAG, "Closing stream");
+                        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Closing stream");
                         stream.close();
                     } catch (IOException e) {
                     }
                 }
                 if (conn != null) {
-                    Log.i(TAG, "Disconnecting");
+                    if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Disconnecting");
                     conn.disconnect();
                 }
             }
