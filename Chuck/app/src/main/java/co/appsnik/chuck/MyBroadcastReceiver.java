@@ -8,6 +8,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import static co.appsnik.chuck.BuildConfig.DEBUG;
+
 class MyBroadcastReceiver extends BroadcastReceiver {
     final static private String TAG = MyBroadcastReceiver.class.getSimpleName();
     final static IntentFilter intentfilter = new IntentFilter();
@@ -21,9 +23,9 @@ class MyBroadcastReceiver extends BroadcastReceiver {
         if (intent.getAction().equals(intentfilter.getAction(0))) {
             boolean connected = isNetworkConnected(context);
             ConnectivityChangeObservable.instance().notify(connected);
-            Log.i(TAG, "isNetworkConnected=" + connected);
+            if (DEBUG && Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "isNetworkConnected=" + connected);
         } else {
-            Log.i(TAG, "Unrecognized intent - " + intent.getAction());
+            if (DEBUG && Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Unrecognized intent - " + intent.getAction());
         }
     }
 

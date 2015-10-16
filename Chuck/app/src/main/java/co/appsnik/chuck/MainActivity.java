@@ -1,5 +1,7 @@
 package co.appsnik.chuck;
 
+import static co.appsnik.chuck.BuildConfig.DEBUG;
+
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements Observer {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         refreshJokeText(null);
+
+        // For verifying BuildConfig.DEBUG is indeed false in release build
+        Log.i(TAG, "BuildConfig.DEBUG=" + DEBUG);
 
         WebView webview = (WebView)findViewById(R.id.attibutions);
         webview.loadData(getString(R.string.icon_attirbution), "text/html", null);
@@ -147,13 +152,13 @@ public class MainActivity extends AppCompatActivity implements Observer {
             } finally {
                 if (stream != null) {
                     try {
-                        if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Closing stream");
+                        if (DEBUG && Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Closing stream");
                         stream.close();
                     } catch (IOException e) {
                     }
                 }
                 if (conn != null) {
-                    if (Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Disconnecting");
+                    if (DEBUG && Log.isLoggable(TAG, Log.DEBUG)) Log.d(TAG, "Disconnecting");
                     conn.disconnect();
                 }
             }
@@ -161,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
 
         @Override
         protected void onPostExecute(String result) {
-            Log.i(TAG, null != result ? result : "(null)");
+            Log.i(TAG, "onPostExecute: " + ((null != result) ? result : "(null)"));
         }
 
         private String convertStreamToString(java.io.InputStream is) {
